@@ -482,25 +482,6 @@ var S = (h, r, a) =>
   };
 })();
 
-self.onmessage = async function (message) {
-  const e = JSON.parse(message.data);
-  switch (e.method) {
-    case "turboMode":
-      a.setTurboMode(e.data);
-      break;
-    case "stop":
-      await a.stop();
-      M("minterStatus", { minting: a.isMinting });
-      break;
-    case "fetchStatus":
-      console.log(a.lastMeasurement, a.hashesProcessed);
-      break;
-    case "mintTask":
-      a.start(e.data);
-      break;
-  }
-};
-
 (async function () {
   "use strict";
 
@@ -669,4 +650,26 @@ self.onmessage = async function (message) {
   function notify(method, data) {
     postMessage(JSON.stringify({ method, data }));
   }
+
+  let minter = new Minter();
+
+  self.onmessage = async function (message) {
+    const event = JSON.parse(message.data);
+
+    switch (event.method) {
+      case "turboMode":
+        minter.setTurboMode(event.data);
+        break;
+      case "stop":
+        await minter.stop();
+        notify("minterStatus", { minting: minter.isMinting });
+        break;
+      case "fetchStatus":
+        console.log("Всё ахуенно братик)");
+        break;
+      case "mintTask":
+        minter.start(event.data);
+        break;
+    }
+  };
 })();
